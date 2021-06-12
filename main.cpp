@@ -17,7 +17,11 @@ public:
         os << "number: " << family.number << " name: " << family.name;
         return os;
     }
+    friend ofstream &operator<<(ofstream &os, const Family &family) {
 
+        os <<family.name<<" "<<family.number<<" "<<family.isValuable;
+        return os;
+    }
     bool operator==(const Family &rhs) const {
         return number == rhs.number &&
                name == rhs.name;
@@ -50,7 +54,11 @@ public:
            << " money: " << bill.money << " year: " << bill.year << " month: " << bill.month;
         return os;
     }
-
+    friend ofstream &operator<<(ofstream &os, const Bill &bill) {
+        os  << bill.family << " " << bill.num << " " << bill.call << " " << bill.type
+           << " " << bill.money << " " << bill.year << " " << bill.month;
+        return os;
+    }
     bool operator==(const Bill &rhs) const {
         return family == rhs.family &&
                num == rhs.num &&
@@ -85,6 +93,7 @@ public:
     }
 
 
+
 };
 
 class BillManagerSystem {
@@ -92,6 +101,62 @@ public:
     vector<Bill> bills;
     vector<Family> families;
 
+    BillManagerSystem() {
+        load();
+    }
+
+    void save(){
+        ofstream f1("data_bill.txt");
+        for(auto i = bills.begin();i<bills.end();i++){
+            f1<<*i<<endl;
+        }
+
+        f1.close();
+        ofstream f2("data_family.txt");
+        for(auto i = families.begin();i<families.end();i++){
+            f2<<*i<<endl;
+        }
+
+        f2.close();
+        cout<<"保存成功！"<<endl;
+    }
+    void load(){
+        ifstream f1("data_bill.txt");
+        if(f1.is_open()){
+            Bill bill;
+            Bill *i=&bill;
+            while((f1>>i->family>>i->num>>i->call>>i->type>>i->money>>i->year>>i->month)){
+                bills.push_back(bill);
+            }
+        }
+
+
+
+        ifstream f2("data_family.txt");
+        if(f2.is_open()){
+            Family family;
+            Family * i=&family;
+            while(f2>>i->name>>i->number>>i->isValuable){
+                families.push_back(family);
+            }
+        }
+        if(!bills.empty()){
+            cout<<"加载了"<<bills.size()<<"条账单数据"<<endl;
+        }else{
+            cout<<"未能加载任何账单数据"<<endl;
+        }
+
+        if(!families.empty()){
+            cout<<"加载了"<<families.size()<<"条用户数据"<<endl;
+        }else{
+            cout<<"未能加载任何用户数据"<<endl;
+        }
+
+        f1.close();
+        f2.close();
+
+
+    }
     void addBill(Bill bill) { bills.push_back(bill); };//新增一个订单到系统
     void showBills(vector<Bill> bs) {//展示订单信息
         if (bs.empty()) {
@@ -274,7 +339,7 @@ void menu() {
 int showOption() {//展示操作选项
     cout << "请输入您的操作选项" << endl;
     cout << "1 查看所有订单 2 查看所有用户 3 新增订单 4 新增用户" << endl;
-    cout << "5 删除订单 6 删除用户 7 修改订单 8 修改用户信息 9 查询操作 0 退出系统" << endl;
+    cout << "5 删除订单 6 删除用户 7 修改订单 8 修改用户信息 9 查询操作 0 保存" << endl;
     int option;
     cin >> option;
 
@@ -372,7 +437,8 @@ int main() {
         }
         switch (option) {
             case 0:
-                return 0;
+                billManagerSystem.save();
+                break;
             case 1:
                 billManagerSystem.showBills(billManagerSystem.bills);
                 break;

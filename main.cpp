@@ -269,7 +269,7 @@ public:
     bool modifyFamily(const Family &newFamily, const Family &targetFamily) {//修改家庭信息
         for (auto i = families.begin(); i < families.end(); i++) {
             if (*i == targetFamily) {
-                *i == newFamily;
+                *i = newFamily;
                 return true;
             }
         }
